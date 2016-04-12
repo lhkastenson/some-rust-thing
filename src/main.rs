@@ -129,16 +129,16 @@ impl Game {
         match inp {
             Input::Press(but) => {
                 match but {
-                    Button::Keyboard(Key::Up) => {
+                    Button::Keyboard(Key::Up) | Button::Keyboard(Key::W) => {
                         self.up_d = true;
                     }
-                    Button::Keyboard(Key::Down) => {
+                    Button::Keyboard(Key::Down) | Button::Keyboard(Key::S)=> {
                         self.down_d = true;
                     }
-                    Button::Keyboard(Key::Left) => {
+                    Button::Keyboard(Key::Left) | Button::Keyboard(Key::A) => {
                         self.left_d = true;
                     }
-                    Button::Keyboard(Key::Right) => {
+                    Button::Keyboard(Key::Right) | Button::Keyboard(Key::D) => {
                         self.right_d = true;
                     }
                     _ => {}
@@ -146,16 +146,16 @@ impl Game {
             }
             Input::Release(but) => {
                 match but {
-                    Button::Keyboard(Key::Up) => {
+                    Button::Keyboard(Key::Up) | Button::Keyboard(Key::W) => {
                         self.up_d = false;
                     }
-                    Button::Keyboard(Key::Down) => {
+                    Button::Keyboard(Key::Down) | Button::Keyboard(Key::S) => {
                         self.down_d = false;
                     }
-                    Button::Keyboard(Key::Left) => {
+                    Button::Keyboard(Key::Left) | Button::Keyboard(Key::A) => {
                         self.left_d = false;
                     }
-                    Button::Keyboard(Key::Right) => {
+                    Button::Keyboard(Key::Right) | Button::Keyboard(Key::D) => {
                         self.right_d = false;
                     }
                     Button::Mouse(MouseButton::Left) => {
