@@ -125,60 +125,53 @@ impl Game {
             }
         });
     }
-    fn on_input(&mut self, inp: Input) {
-        match inp {
-            Input::Press(but) => {
-                match but {
-                    Button::Keyboard(Key::Up) | Button::Keyboard(Key::W) => {
-                        self.up_d = true;
-                    }
-                    Button::Keyboard(Key::Down) | Button::Keyboard(Key::S)=> {
-                        self.down_d = true;
-                    }
-                    Button::Keyboard(Key::Left) | Button::Keyboard(Key::A) => {
-                        self.left_d = true;
-                    }
-                    Button::Keyboard(Key::Right) | Button::Keyboard(Key::D) => {
-                        self.right_d = true;
-                    }
-                    _ => {}
-                }
+
+    fn on_button_press(&mut self, but: Button) {
+        match but {
+            Button::Keyboard(Key::Up) | Button::Keyboard(Key::W) => {
+                self.up_d = true;
             }
-            Input::Release(but) => {
-                match but {
-                    Button::Keyboard(Key::Up) | Button::Keyboard(Key::W) => {
-                        self.up_d = false;
-                    }
-                    Button::Keyboard(Key::Down) | Button::Keyboard(Key::S) => {
-                        self.down_d = false;
-                    }
-                    Button::Keyboard(Key::Left) | Button::Keyboard(Key::A) => {
-                        self.left_d = false;
-                    }
-                    Button::Keyboard(Key::Right) | Button::Keyboard(Key::D) => {
-                        self.right_d = false;
-                    }
-                    Button::Mouse(MouseButton::Left) => {
-                        self.bullets.push(self.player1.fire(self.bullet.clone().unwrap()));
-                    }
-                    _ => {}
-                }
+            Button::Keyboard(Key::Down) | Button::Keyboard(Key::S)=> {
+                self.down_d = true;
             }
-            Input::Move(mot) => {
-                match mot {
-                    Motion::MouseCursor(x, y) => {
-                        self.player1.point_tur_to(x - self.scx, y - self.scy);
-                    }
-                    _ => {}
-                }
+            Button::Keyboard(Key::Left) | Button::Keyboard(Key::A) => {
+                self.left_d = true;
+            }
+            Button::Keyboard(Key::Right) | Button::Keyboard(Key::D) => {
+                self.right_d = true;
             }
             _ => {}
         }
     }
+
+    fn on_button_release(&mut self, but: Button, e: PistonWindow, ) {
+        match but {
+            Button::Keyboard(Key::Up) | Button::Keyboard(Key::W) => {
+                self.up_d = false;
+            }
+            Button::Keyboard(Key::Down) | Button::Keyboard(Key::S) => {
+                self.down_d = false;
+            }
+            Button::Keyboard(Key::Left) | Button::Keyboard(Key::A) => {
+                self.left_d = false;
+            }
+            Button::Keyboard(Key::Right) | Button::Keyboard(Key::D) => {
+                self.right_d = false;
+            }
+            Button::Mouse(MouseButton::Left) => {
+                self.bullets.push(self.player1.fire(self.bullet.clone().unwrap()));
+            }
+            _ => {}
+        }
+    }
+
+    fn on_cursor_move(&mut self, x: f64, y: f64) {
+        self.player1.point_tur_to(x - self.scx, y - self.scy);
+    }
 }
 
 fn main() {
-    let window: PistonWindow = WindowSettings::new(
+    let mut window: PistonWindow = WindowSettings::new(
         "piston-tutorial",
         [1200, 800]
     )
@@ -187,20 +180,27 @@ fn main() {
     .unwrap();
     let mut game = Game::new();
     game.on_load(&window);
+    let mut cursor = [0.0, 0.0];
     for e in window {
-        match e.event {
-            Some(Event::Update(upd)) => {
-                game.on_update(upd);
-            }
-            Some(Event::Render(ren)) => {
-                game.on_draw(ren, e);
-            }
-            Some(Event::Input(inp)) => {
-                game.on_input(inp);
-            }
-            _ => {
+        e.mouse_cursor(|x, y| {
+            cursor = [x, y];
+            game.on_cursor_move(x, y);
 
-            }
+        });
+        if let Some(ref args) = e.render_args() {
+            game.on_draw(*args, e);
+        }
+
+        else if let Some(ref args) = e.update_args() {
+            game.on_update(*args);
+        }
+
+        else if let Some(ref args) = e.press_args() {
+            game.on_button_press(*args);
+        }
+
+        else if let Some(ref args) = e.release_args() {
+            game.on_button_release(*args, e);
         }
     }
 }
