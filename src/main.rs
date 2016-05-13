@@ -5,9 +5,11 @@ extern crate gfx_graphics;
 extern crate gfx;
 extern crate nalgebra;
 extern crate ncollide;
+extern crate opengl_graphics;
 
 use piston_window::*;
 use gfx_device_gl::{Resources};
+use opengl_graphics::{ GlGraphics, OpenGL };
 
 use nalgebra::Vec2 as Vector2;
 type Vec2 = Vector2<f64>;
@@ -25,12 +27,14 @@ struct Game {
     turret_destroyed: Option<Texture<Resources>>,
     bullet: Option<Texture<Resources>>,
     up_d: bool, down_d: bool, left_d: bool, right_d: bool,
-    scx: f64, scy: f64
+    scx: f64, scy: f64,
+    start_x: f64, start_y: f64,
+    is_moving: bool
 }
 
 impl Game {
     fn new() -> Game {
-        Game { player1 : Tank::new(), player2: Tank::new(), bullets: Vec::<Bullet>::new(), up_d: false, down_d: false, left_d: false, right_d: false, scx: 300.0, scy: 300.0,
+        Game { player1 : Tank::new(), player2: Tank::new(), bullets: Vec::<Bullet>::new(), up_d: false, down_d: false, left_d: false, right_d: false, scx: 600.0, scy: 400.0, start_x: 0, start_y: 0, is_moving: false
             hull_destroyed: None, turret_destroyed: None, bullet: None }
     }
     fn on_load(&mut self, w: &PistonWindow) {
@@ -144,7 +148,7 @@ impl Game {
         }
     }
 
-    fn on_button_release(&mut self, but: Button, e: PistonWindow, ) {
+    fn on_button_release(&mut self, but: Button, e: PistonWindow, cursor: &[f64]) {
         match but {
             Button::Keyboard(Key::Up) | Button::Keyboard(Key::W) => {
                 self.up_d = false;
@@ -160,6 +164,14 @@ impl Game {
             }
             Button::Mouse(MouseButton::Left) => {
                 self.bullets.push(self.player1.fire(self.bullet.clone().unwrap()));
+                if (!is_moving) {
+                    self.start_x = cursor[0];
+                    self.start_y = cursor[1];
+                    is_moving = true;
+                } else {
+                    is_moving = false;
+                }
+                println!("coordinates are: {}, {}", cursor[0], cursor[1]);
             }
             _ => {}
         }
@@ -167,7 +179,13 @@ impl Game {
 
     fn on_cursor_move(&mut self, x: f64, y: f64) {
         self.player1.point_tur_to(x - self.scx, y - self.scy);
+        if 
     }
+
+    fn start_draw_line(&mut self, x:i64, y:i64) {
+        
+    }
+    
 }
 
 fn main() {
@@ -200,7 +218,7 @@ fn main() {
         }
 
         else if let Some(ref args) = e.release_args() {
-            game.on_button_release(*args, e);
+            game.on_button_release(*args, e, &cursor);
         }
     }
 }

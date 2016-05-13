@@ -94,6 +94,33 @@ pub struct Bullet {
     pub to_be_removed: bool
 }
 
+pub struct MovePath {
+    pub move_path: Componenet,
+    pub to_be_removed: bool
+}
+
+#[allow(dead_code)]
+impl Object for MovePath {
+    fn mov(&mut self, pos: Vec2) {
+        self.move_path.trans.mov(pos);
+    }
+    fn mov_to(&mut self, pos:Vec2) {
+        self.move_path.trans.move_to(pos);
+    }
+    fn rot(&mut self, r: f64) {
+        self.move_path.trans.rot(r);
+    }
+    fn fwd(&mut self, d: f64) {
+        self.move_path.trans.fwd(d);
+    }
+    fn update(&mut self, dt: f64) {
+        self.calc_move_path(dt);
+    }
+    fn render(&self, g: &mut GfxGraphics<Resources, CommandBuffer<Resources>, Output>, view: math::Matrix2d) {
+        self.move_path.render(g, view);
+    }
+}
+
 #[allow(dead_code)]
 impl Object for Bullet {
     fn mov(&mut self, pos: Vec2) {
